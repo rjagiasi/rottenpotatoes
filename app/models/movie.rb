@@ -3,11 +3,7 @@ class Movie < ActiveRecord::Base
         return ['G','PG','PG-13','R']
     end
     
-    def self.with_ratings(ratings)
-        if ratings.nil?
-            Movie.all
-        else
-            Movie.where(rating:ratings)
-        end
+    def self.with_ratings(ratings, sortcol)
+        Movie.where(rating:ratings).order(sortcol)
     end
 end

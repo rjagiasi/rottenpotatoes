@@ -7,10 +7,15 @@ class MoviesController < ApplicationController
   end
 
   def index
+    sortcol = params[:sortby]
+    # puts sortcol
+    if !(sortcol == "title" or sortcol == "release_date")
+      sortcol = ""
+    end
+    @sortby = sortcol
     @all_ratings = Movie.all_ratings
     ratings = params[:ratings].nil? ? @all_ratings : params[:ratings].keys
-    # puts ratings.keys
-    @movies = Movie.with_ratings(ratings)
+    @movies = Movie.with_ratings(ratings, sortcol)
     @ratings_to_show = ratings
   end
 
