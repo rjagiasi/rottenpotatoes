@@ -8,6 +8,17 @@ class MoviesController < ApplicationController
 
   def index
     # handle sort column
+    # puts "LOL", request.referrer
+    
+    @all_ratings = Movie.all_ratings
+    refurl = request.referrer
+    
+    if refurl.nil? or not(refurl.include? "amazonaws" or refurl.include? "heroku")
+      # ratings = @all_ratings
+      # sortcol = ""
+      reset_session
+    end
+    # else
     sortcol = params[:sortby]
     if sortcol.nil?
        sortcol = session[:sortcol]
@@ -17,17 +28,15 @@ class MoviesController < ApplicationController
       sortcol = ""
     end
     @sortby = sortcol
-    session[:sortcol] = sortcol
-    
-    
-    @all_ratings = Movie.all_ratings
     # ratings = params[:ratings].nil? ? @all_ratings : params[:ratings].keys
     ratings = params[:ratings].nil? ? ((session[:ratings_to_show].nil? or params[:commit] == "Refresh") ? @all_ratings : JSON.parse(session[:ratings_to_show])) : params[:ratings].keys
+    # end
     
     @movies = Movie.with_ratings(ratings, sortcol)
     @ratings_to_show = ratings
     session[:ratings_to_show] = JSON.generate(ratings)
-    
+    session[:sortcol] = sortcol
+      
   end
 
   def new
