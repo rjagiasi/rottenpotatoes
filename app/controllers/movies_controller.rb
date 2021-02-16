@@ -7,16 +7,27 @@ class MoviesController < ApplicationController
   end
 
   def index
+    # handle sort column
     sortcol = params[:sortby]
+    if sortcol.nil?
+       sortcol = session[:sortcol]
+    end
     # puts sortcol
     if !(sortcol == "title" or sortcol == "release_date")
       sortcol = ""
     end
     @sortby = sortcol
+    session[:sortcol] = sortcol
+    
+    
     @all_ratings = Movie.all_ratings
-    ratings = params[:ratings].nil? ? @all_ratings : params[:ratings].keys
+    # ratings = params[:ratings].nil? ? @all_ratings : params[:ratings].keys
+    ratings = params[:ratings].nil? ? ((session[:ratings_to_show].nil? or params[:commit] == "Refresh") ? @all_ratings : JSON.parse(session[:ratings_to_show])) : params[:ratings].keys
+    
     @movies = Movie.with_ratings(ratings, sortcol)
     @ratings_to_show = ratings
+    session[:ratings_to_show] = JSON.generate(ratings)
+    
   end
 
   def new
